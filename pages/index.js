@@ -1,4 +1,4 @@
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 
 function HomePage() {
   const { data: session } = useSession();
@@ -11,7 +11,6 @@ function HomePage() {
     return (
       <>
         Signed in as {session.user.email}<br/>
-        <button onClick={() => signOut()}>signOut</button>
       </>
     );
   }

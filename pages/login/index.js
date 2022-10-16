@@ -4,6 +4,8 @@ import { useSession } from 'next-auth/react';
 import AuthForm from '../../components/Auth/AuthForm';
 import authHandler from '../../utils/auth-handler';
 
+const isLogin = true;
+
 function LoginPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -17,8 +19,6 @@ function LoginPage() {
 
     return;
   }
-
-  const isLogin = true;
 
   const loginHandler = async credentials => {
     await authHandler({ ...credentials, isLogin });
