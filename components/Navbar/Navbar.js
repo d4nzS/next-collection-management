@@ -29,7 +29,6 @@ const Search = styled('div')(({ theme }) => ({
   marginLeft: 0,
   width: '100%',
   [theme.breakpoints.up('xs')]: {
-    marginLeft: theme.spacing(3),
     width: 'auto',
   },
 }));
@@ -79,7 +78,7 @@ const NavBar = () => {
     router.push(link);
   };
 
-  const signOutHandler = event => {
+  const signOutHandler = () => {
     signOut();
   };
 

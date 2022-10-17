@@ -8,6 +8,7 @@ const isLogin = true;
 
 function LoginPage() {
   const { data: session } = useSession();
+
   const router = useRouter();
 
   if (session === undefined) {
