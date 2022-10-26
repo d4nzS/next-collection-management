@@ -1,13 +1,11 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import mongoose from 'mongoose';
 import { compare, hash } from 'bcrypt';
 
-import UserModel from '../../../models/user-model';
+import connectMongo from '../../../utils/connectMongo';
+import UserModel from '../../../models/db/user-model';
 
-mongoose
-  .connect('mongodb+srv://root:root@cluster0.otui3ia.mongodb.net/?retryWrites=true&w=majority')
-  .catch(err => console.log(err));
+connectMongo();
 
 export const authOptions = {
   pages: {
@@ -54,6 +52,15 @@ export const authOptions = {
       }
     })
   ],
+  callbacks: {
+    async session({ session }) {
+      const user = await UserModel.findOne({ email: session.user.email });
+
+      session.user.id = user._id;
+
+      return session; // need to fix but it works
+    }
+  }
 };
 
 export default NextAuth(authOptions);

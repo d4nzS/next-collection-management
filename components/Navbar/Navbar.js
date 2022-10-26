@@ -25,7 +25,7 @@ const Search = styled('div')(({ theme }) => ({
   '&:hover': {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
-  marginRight: theme.spacing(2),
+  marginRight: 0,
   marginLeft: 0,
   width: '100%',
   [theme.breakpoints.up('xs')]: {
@@ -34,7 +34,7 @@ const Search = styled('div')(({ theme }) => ({
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
+  padding: theme.spacing(0, 1),
   height: '100%',
   position: 'absolute',
   pointerEvents: 'none',
@@ -47,7 +47,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    paddingLeft: `calc(1em + ${theme.spacing(3)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
@@ -76,6 +76,8 @@ const NavBar = () => {
 
   const linkHandler = link => {
     router.push(link);
+
+    setAnchorElUser(null);
   };
 
   const signOutHandler = () => {
@@ -84,19 +86,18 @@ const NavBar = () => {
 
   const authButtons = (
     <>
-      <Button color="inherit" onClick={linkHandler.bind(null, '/login')}>Sign in</Button>
-      <Button color="inherit" onClick={linkHandler.bind(null, '/signup')}>Sign up</Button>
+      <Button color="inherit" onClick={() => linkHandler('/login')}>Sign in</Button>
+      <Button color="inherit" onClick={() => linkHandler('/signup')}>Sign up</Button>
     </>
   );
 
   const userManagement = (
-    <Box sx={{ flexGrow: 0 }}>
+    <Box sx={{ flexGrow: 0, ml: 2 }}>
       <Tooltip title="Open settings">
         <IconButton onClick={openUserMenuHandler} sx={{ p: 0 }}>
           <Avatar/>
         </IconButton>
       </Tooltip>
-
       <Menu
         sx={{ mt: '45px' }}
         id="menu-appbar"
@@ -113,8 +114,8 @@ const NavBar = () => {
         open={Boolean(anchorElUser)}
         onClose={closeUserMenuHandler}
       >
-        <MenuItem>
-          <Typography textAlign="center" sx={{ cursor: 'auto' }}>{session?.user.email}</Typography>
+        <MenuItem onClick={() => linkHandler(`/${session?.user.id}`)}>
+          <Typography textAlign="center">{session?.user.email}</Typography>
         </MenuItem>
         <MenuItem onClick={signOutHandler}>
           <Typography textAlign="center">Sign out</Typography>
@@ -126,8 +127,15 @@ const NavBar = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{pl: 0, pr: 0}}>
           <Toolbar>
+            <Typography
+              variant="h6"
+              sx={{ mr: 2, cursor: 'pointer' }}
+              onClick={() => linkHandler('/')}
+            >
+              CM
+            </Typography>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon/>

@@ -26,7 +26,7 @@ const AuthForm = ({ isLoginMode, onAuth }) => {
     hasError: emailInputHasError,
     valueChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
-    reset: resetEmailInput,
+    reset: resetEmailInput
   } = useInput(value => EMAIL_REGEXP.test(value));
 
   const {
@@ -35,7 +35,7 @@ const AuthForm = ({ isLoginMode, onAuth }) => {
     hasError: passwordInputHasError,
     valueChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
-    reset: resetPasswordInput,
+    reset: resetPasswordInput
   } = useInput(value => !!value);
 
   const formIsValid = enteredEmailIsValid && enteredPasswordIsValid;
