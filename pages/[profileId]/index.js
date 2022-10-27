@@ -1,11 +1,11 @@
-import { Types } from 'mongoose';
 import { useSession } from 'next-auth/react';
 
-import connectMongo from '../../utils/connectMongo';
-import UserModel from '../../models/db/user-model';
 import InputModel from '../../models/client/input-model';
 import Table from '../../components/UI/Table'
 import fetchData from '../../utils/fetch-data';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { Box, Button, CircularProgress } from '@mui/material';
 
 const collectionTableTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
@@ -20,11 +20,32 @@ const collectionModalTemplate = [
   new InputModel({ name: 'customTextFields', label: 'Custom text fields', type: 'tags', required: false })
 ];
 
-function ProfilePage({ userId, collections }) {
+function ProfilePage() {
   const { data: session } = useSession();
+  const userId = useRouter().query.profileId;
+
+  const [collections, setCollections] = useState(null);
+
+  useEffect(() => {
+    const getCollections = async () => await fetchData({
+      url: '/api/collection/getAll',
+      method: 'POST',
+      body: userId
+    });
+
+    if (userId) {
+      getCollections().then(data => setCollections(data));
+    }
+  }, [userId])
 
   if (session === undefined) {
     return;
+  }
+
+  if (!collections) {
+    return <Box sx={{ p: { xs: 2, sm: 3 } }}>
+      <CircularProgress/>
+    </Box>;
   }
 
   const createCollectionHandler = async collection => {
@@ -62,26 +83,6 @@ function ProfilePage({ userId, collections }) {
     onEditRow={updateCollectionHandler}
     onDeleteRow={deleteCollectionHandler}
   />;
-}
-
-export async function getServerSideProps(context) {
-  await connectMongo();
-
-  const profileId = context.params.profileId;
-  const selectedProfile = await UserModel.findOne({ _id: Types.ObjectId(profileId) });
-  const collections = selectedProfile.collections.map(collection => ({
-    _id: collection._id,
-    name: collection.name,
-    topic: collection.topic,
-    description: collection.description
-  }));
-
-  return {
-    props: {
-      userId: profileId,
-      collections: JSON.parse(JSON.stringify(collections))
-    }
-  };
 }
 
 export default ProfilePage;

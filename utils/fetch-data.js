@@ -1,4 +1,4 @@
-async function fetchData(requestConfig = {}) {
+async function fetchData(requestConfig) {
   try {
     const response = await fetch(requestConfig.url, {
       method: requestConfig.method,

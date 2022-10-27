@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import MaterialReactTable from 'material-react-table';
-import { Container, MenuItem } from '@mui/material';
+import { CircularProgress, Container, MenuItem } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 
 import classes from './Table.module.css';
