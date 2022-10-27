@@ -13,9 +13,25 @@ import {
   Stack,
   TextField
 } from '@mui/material';
+import CreatableSelect from 'react-select/creatable';
 
 const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
-  const [values, setValues] = useState({});
+  const [values, setValues] = useState(fields.reduce((fieldsObj, field) => {
+    fieldsObj[field.name] = field.type === 'tags'
+      ? []
+      : '';
+
+    return fieldsObj;
+  }, {}));
+
+  console.log(values);
+
+  const changeHandler = event => {
+    setValues(prevValues => ({
+      ...prevValues,
+      [event.target.name]: event.target.value
+    }));
+  };
 
   const submitHandler = event => {
     event.preventDefault();
@@ -34,7 +50,8 @@ const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
               id={field.name}
               name={field.name}
               label={field.label}
-              onChange={e => setValues({ ...values, [e.target.name]: e.target.value })}
+              value={values[field.name]}
+              onChange={changeHandler}
               required={field.required}
             >
               {field.options.map(option => (
@@ -45,21 +62,30 @@ const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
             </Select>
           </FormControl>
         );
-      // case 'tags':
-      //   return (
-      //   );
+
+      case 'tags':
+        return <CreatableSelect
+          key={field.name}
+          isClearable
+          isMulti
+          onChange={newValue => setValues(prevValues => ({
+            ...prevValues,
+            [field.name]: newValue.map(val => val.value.trim())
+          }))}
+          placeholder={field.label}
+        />
+
       default:
-        return (
-          <TextField
-            key={field.name}
-            variant="standard"
-            label={field.label}
-            name={field.name}
-            onChange={e => setValues({ ...values, [e.target.name]: e.target.value.trim() })}
-            required={field.required}
-            multiline={field.type === 'textarea'}
-          />
-        );
+        return <TextField
+          key={field.name}
+          variant="standard"
+          name={field.name}
+          label={field.label}
+          value={values[field.name]}
+          onChange={changeHandler}
+          required={field.required}
+          multiline={field.type === 'textarea'}
+        />;
     }
   });
 

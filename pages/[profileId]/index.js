@@ -18,7 +18,12 @@ const collectionTableTemplate = [
 
 const collectionModalTemplate = [
   ...collectionTableTemplate,
-  new InputModel({ name: 'customTextFields', label: 'Custom text fields', type: 'tags', required: false })
+  new InputModel({ name: 'customNumberFields', label: 'Type number fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'customStringFields', label: 'Type string fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'customTextFields', label: 'Type text fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'customCheckboxFields', label: 'Type yes/no fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'customDateFields', label: 'Type text fields and press enter...', type: 'tags', required: false })
+
 ];
 
 function ProfilePage() {
@@ -30,25 +35,23 @@ function ProfilePage() {
   const [collections, setCollections] = useState(null);
 
   useEffect(() => {
-    const getCollections = async () => await fetchData({
-      url: '/api/collection/getAll',
-      method: 'POST',
-      body: userId
-    });
+    const getCollections = async () => await fetchData({ url: `/api/collection/getAll/${userId}` });
+
+    setError(null);
 
     if (userId) {
       getCollections()
         .then(data => setCollections(data))
         .catch(err => setError(err));
     }
-  }, [userId])
-
-  if (error) {
-    return <Error statusCode={error.status}/>;
-  }
+  }, [userId]);
 
   if (session === undefined) {
     return;
+  }
+
+  if (error) {
+    return <Error statusCode={error.status} title={error.message}/>;
   }
 
   if (!collections) {

@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Error from 'next/error';
 import { useSession } from 'next-auth/react';
+import { Box, CircularProgress } from '@mui/material';
 
 import InputModel from '../../../models/client/input-model';
 import fetchData from '../../../utils/fetch-data';
 import Table from '../../../components/UI/Table';
-import { Box, CircularProgress } from '@mui/material';
-
 
 const itemModalTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
@@ -30,20 +29,20 @@ function CollectionPage() {
 
   useEffect(() => {
     const getItems = async () => await fetchData({
-      url: '/api/collection/item/getAll',
-      method: 'POST',
-      body: { userId, collectionId }
+      url: `/api/collection/item/getAll/${userId}/${collectionId}`
     });
+
+    setError(null);
 
     if (userId && collectionId) {
       getItems()
         .then(data => setItems(data))
         .catch(err => setError(err));
     }
-  }, [userId, collectionId])
+  }, [userId, collectionId]);
 
   if (error) {
-    return <Error statusCode={error.status}/>;
+    return <Error statusCode={error.status} title={error.message}/>;
   }
 
   if (session === undefined) {

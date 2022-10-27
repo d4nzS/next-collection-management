@@ -1,10 +1,11 @@
 import { Types } from 'mongoose';
 
+import ApiError from '../../../exceptions/api-error';
 import UserModel from '../../../models/db/user-model';
 
 async function createCollectionHandler(req, res) {
   if (req.method !== 'POST') {
-    res.status(400).json({ message: 'Expected post request method!' });
+    throw ApiError.BadRequest('post');
   }
 
   try {
@@ -19,7 +20,7 @@ async function createCollectionHandler(req, res) {
 
     res.status(201).json(collectionId);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(err.status || 500).json({ message: err.message });
   }
 }
 

@@ -1,7 +1,7 @@
 async function fetchData(requestConfig) {
   const response = await fetch(requestConfig.url, {
-    method: requestConfig.method,
-    body: JSON.stringify(requestConfig.body),
+    method: requestConfig.method || 'GET',
+    body: JSON.stringify(requestConfig.body) || null,
     headers: { 'Content-Type': 'application/json' }
   });
 

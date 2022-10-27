@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import MaterialReactTable from 'material-react-table';
-import { CircularProgress, Container, MenuItem } from '@mui/material';
+import { Container, MenuItem } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 
 import classes from './Table.module.css';
@@ -131,7 +131,7 @@ const Table = ({ mode, url, features, modalFields, data, hasChangeRight, onCreat
         onEditingRowSave={saveRowEditsHandler}
         renderRowActions={({ row, table }) => (
           <TableActions
-            link={url + '/' + tableData[row.index]._id}
+            link={`/${url}/${tableData[row.index]._id}`}
             hasChangeRight={hasChangeRight}
             onEditRow={() => table.setEditingRow(row)}
             onDeleteRow={() => deleteRowHandler(row)}

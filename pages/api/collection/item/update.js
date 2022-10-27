@@ -1,10 +1,11 @@
 import { Types } from 'mongoose';
 
+import ApiError from '../../../../exceptions/api-error';
 import UserModel from '../../../../models/db/user-model';
 
 async function updateItemHandler(req, res) {
   if (req.method !== 'PUT') {
-    res.status(400).json({ message: 'Expected put request method!' });
+    throw ApiError.BadRequest('put');
   }
 
   try {
@@ -20,7 +21,7 @@ async function updateItemHandler(req, res) {
 
     res.status(201).json({ message: 'The item has been changed!' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(err.status || 500).json({ message: err.message });
   }
 }
 
