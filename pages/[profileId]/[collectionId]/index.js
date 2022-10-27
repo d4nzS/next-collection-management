@@ -1,11 +1,12 @@
-import { Types } from 'mongoose';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 
-import connectMongo from '../../../utils/connectMongo';
-import UserModel from '../../../models/db/user-model';
 import InputModel from '../../../models/client/input-model';
-import Table from '../../../components/UI/Table';
 import fetchData from '../../../utils/fetch-data';
+import Table from '../../../components/UI/Table';
+import { Box, CircularProgress } from '@mui/material';
+
 
 const itemModalTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
@@ -17,11 +18,34 @@ const itemTableTemplate = [
   ...itemModalTemplate
 ];
 
-function CollectionPage({ userId, collectionId, items }) {
+function CollectionPage() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const userId = router.query.profileId;
+  const collectionId = router.query.collectionId;
+
+  const [items, setItems] = useState(null);
+
+  useEffect(() => {
+    const getItems = async () => await fetchData({
+      url: '/api/collection/item/getAll',
+      method: 'POST',
+      body: { userId, collectionId }
+    });
+
+    if (userId && collectionId) {
+      getItems().then(data => setItems(data));
+    }
+  }, [userId, collectionId])
 
   if (session === undefined) {
     return;
+  }
+
+  if (!items) {
+    return <Box sx={{ p: { xs: 2, sm: 3 } }}>
+      <CircularProgress/>
+    </Box>;
   }
 
   const createItemHandler = async item => {
@@ -59,24 +83,6 @@ function CollectionPage({ userId, collectionId, items }) {
     onEditRow={updateItemHandler}
     onDeleteRow={deleteItemCollectionHandler}
   />
-}
-
-export async function getServerSideProps(context) {
-  await connectMongo();
-
-  const userId = context.params.profileId;
-  const collectionId = context.params.collectionId;
-
-  const selectedProfile = await UserModel.findOne({ _id: Types.ObjectId(userId) });
-  const selectedCollection = selectedProfile.collections.find(collection => collection._id.toString() === collectionId);
-
-  return {
-    props: {
-      userId,
-      collectionId,
-      items: JSON.parse(JSON.stringify(selectedCollection.items))
-    }
-  };
 }
 
 export default CollectionPage;

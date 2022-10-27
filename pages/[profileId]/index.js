@@ -1,11 +1,12 @@
-import { useSession } from 'next-auth/react';
-
-import InputModel from '../../models/client/input-model';
-import Table from '../../components/UI/Table'
-import fetchData from '../../utils/fetch-data';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Button, CircularProgress } from '@mui/material';
+import { useSession } from 'next-auth/react';
+import { Box, CircularProgress } from '@mui/material';
+
+import InputModel from '../../models/client/input-model';
+import fetchData from '../../utils/fetch-data';
+import Table from '../../components/UI/Table'
+
 
 const collectionTableTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
@@ -22,7 +23,8 @@ const collectionModalTemplate = [
 
 function ProfilePage() {
   const { data: session } = useSession();
-  const userId = useRouter().query.profileId;
+  const router = useRouter();
+  const userId = router.query.profileId;
 
   const [collections, setCollections] = useState(null);
 
