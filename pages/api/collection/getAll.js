@@ -1,5 +1,3 @@
-import { Types } from 'mongoose';
-
 import UserModel from '../../../models/db/user-model';
 
 async function getAllCollectionsHandler(req, res) {
@@ -9,12 +7,11 @@ async function getAllCollectionsHandler(req, res) {
 
   try {
     const userId = req.body;
-
-    const user = await UserModel.findOne({ _id: Types.ObjectId(userId) });
+    const user = await UserModel.findById({ _id: userId });
 
     res.status(201).json(user.collections);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(404).json({ message: "This profile doesn't exist!" });
   }
 }
 

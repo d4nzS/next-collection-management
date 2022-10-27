@@ -1,21 +1,18 @@
 async function fetchData(requestConfig) {
-  try {
-    const response = await fetch(requestConfig.url, {
-      method: requestConfig.method,
-      body: JSON.stringify(requestConfig.body),
-      headers: { 'Content-Type': 'application/json' }
-    });
+  const response = await fetch(requestConfig.url, {
+    method: requestConfig.method,
+    body: JSON.stringify(requestConfig.body),
+    headers: { 'Content-Type': 'application/json' }
+  });
 
-    if (!response.ok) {
-      const error = await response.json();
+  if (!response.ok) {
+    const error = new Error((await response.json()).message || 'Unexpected Error');
+    error.status = response.status;
 
-      throw new Error(error.message || 'Unexpected error');
-    }
-
-    return await response.json();
-  } catch (err) {
-    alert(err.message);
+    throw error;
   }
+
+  return response.json();
 }
 
 export default fetchData;

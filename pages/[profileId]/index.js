@@ -6,7 +6,7 @@ import { Box, CircularProgress } from '@mui/material';
 import InputModel from '../../models/client/input-model';
 import fetchData from '../../utils/fetch-data';
 import Table from '../../components/UI/Table'
-
+import Error from 'next/error';
 
 const collectionTableTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
@@ -26,6 +26,7 @@ function ProfilePage() {
   const router = useRouter();
   const userId = router.query.profileId;
 
+  const [error, setError] = useState(null);
   const [collections, setCollections] = useState(null);
 
   useEffect(() => {
@@ -36,9 +37,15 @@ function ProfilePage() {
     });
 
     if (userId) {
-      getCollections().then(data => setCollections(data));
+      getCollections()
+        .then(data => setCollections(data))
+        .catch(err => setError(err));
     }
   }, [userId])
+
+  if (error) {
+    return <Error statusCode={error.status}/>;
+  }
 
   if (session === undefined) {
     return;
@@ -51,27 +58,39 @@ function ProfilePage() {
   }
 
   const createCollectionHandler = async collection => {
-    return await fetchData({
-      url: '/api/collection/create',
-      method: 'POST',
-      body: { userId, collection }
-    });
+    try {
+      return await fetchData({
+        url: '/api/collection/create',
+        method: 'POST',
+        body: { userId, collection }
+      });
+    } catch (err) {
+      alert(err);
+    }
   };
 
   const updateCollectionHandler = async collection => {
-    return await fetchData({
-      url: '/api/collection/update',
-      method: 'PUT',
-      body: collection
-    });
+    try {
+      return await fetchData({
+        url: '/api/collection/update',
+        method: 'PUT',
+        body: collection
+      });
+    } catch (err) {
+      alert(err);
+    }
   };
 
   const deleteCollectionHandler = async collectionId => {
-    return await fetchData({
-      url: '/api/collection/delete',
-      method: 'DELETE',
-      body: collectionId
-    });
+    try {
+      return await fetchData({
+        url: '/api/collection/delete',
+        method: 'DELETE',
+        body: collectionId
+      });
+    } catch (err) {
+      alert(err);
+    }
   };
 
   return <Table

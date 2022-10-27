@@ -6,6 +6,7 @@ import InputModel from '../../../models/client/input-model';
 import fetchData from '../../../utils/fetch-data';
 import Table from '../../../components/UI/Table';
 import { Box, CircularProgress } from '@mui/material';
+import Error from 'next/error';
 
 
 const itemModalTemplate = [
@@ -24,6 +25,7 @@ function CollectionPage() {
   const userId = router.query.profileId;
   const collectionId = router.query.collectionId;
 
+  const [error, setError] = useState(null);
   const [items, setItems] = useState(null);
 
   useEffect(() => {
@@ -34,9 +36,15 @@ function CollectionPage() {
     });
 
     if (userId && collectionId) {
-      getItems().then(data => setItems(data));
+      getItems()
+        .then(data => setItems(data))
+        .catch(err => setError(err));
     }
   }, [userId, collectionId])
+
+  if (error) {
+    return <Error statusCode={error.status}/>;
+  }
 
   if (session === undefined) {
     return;
