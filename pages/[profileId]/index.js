@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Error from 'next/error';
 import { useSession } from 'next-auth/react';
 import { Box, CircularProgress } from '@mui/material';
 
 import InputModel from '../../models/client/input-model';
 import fetchData from '../../utils/fetch-data';
 import Table from '../../components/UI/Table'
-import Error from 'next/error';
 
 const collectionTableTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
@@ -65,7 +65,7 @@ function ProfilePage() {
         body: { userId, collection }
       });
     } catch (err) {
-      alert(err);
+      setError(err);
     }
   };
 
@@ -77,7 +77,7 @@ function ProfilePage() {
         body: collection
       });
     } catch (err) {
-      alert(err);
+      setError(err);
     }
   };
 
@@ -89,7 +89,7 @@ function ProfilePage() {
         body: collectionId
       });
     } catch (err) {
-      alert(err);
+      setError(err);
     }
   };
 

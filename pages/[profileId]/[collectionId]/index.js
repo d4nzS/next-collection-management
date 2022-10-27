@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Error from 'next/error';
 import { useSession } from 'next-auth/react';
 
 import InputModel from '../../../models/client/input-model';
 import fetchData from '../../../utils/fetch-data';
 import Table from '../../../components/UI/Table';
 import { Box, CircularProgress } from '@mui/material';
-import Error from 'next/error';
 
 
 const itemModalTemplate = [
@@ -57,27 +57,39 @@ function CollectionPage() {
   }
 
   const createItemHandler = async item => {
-    return await fetchData({
-      url: '/api/collection/item/create',
-      method: 'POST',
-      body: { collectionId, item }
-    });
+    try {
+      return await fetchData({
+        url: '/api/collection/item/create',
+        method: 'POST',
+        body: { collectionId, item }
+      });
+    } catch (err) {
+      setError(err);
+    }
   };
 
   const updateItemHandler = async item => {
-    return await fetchData({
-      url: '/api/collection/item/update',
-      method: 'PUT',
-      body: item
-    });
+    try {
+      return await fetchData({
+        url: '/api/collection/item/update',
+        method: 'PUT',
+        body: item
+      });
+    } catch (err) {
+      setError(err);
+    }
   };
 
   const deleteItemCollectionHandler = async itemId => {
-    return await fetchData({
-      url: '/api/collection/item/delete',
-      method: 'DELETE',
-      body: itemId
-    });
+    try {
+      return await fetchData({
+        url: '/api/collection/item/delete',
+        method: 'DELETE',
+        body: itemId
+      });
+    } catch (err) {
+      setError(err);
+    }
   };
 
   return <Table
