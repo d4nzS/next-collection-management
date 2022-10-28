@@ -8,14 +8,9 @@ import InputModel from '../../../models/client/input-model';
 import fetchData from '../../../utils/fetch-data';
 import Table from '../../../components/UI/Table';
 
-const itemModalTemplate = [
+const initialItemModalTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
   new InputModel({ name: 'tags', label: 'Tags' })
-];
-
-const itemTableTemplate = [
-  new InputModel({ name: '_id', label: 'id', enableEditing: false }),
-  ...itemModalTemplate
 ];
 
 function CollectionPage() {
@@ -26,6 +21,7 @@ function CollectionPage() {
 
   const [error, setError] = useState(null);
   const [items, setItems] = useState(null);
+  const [itemModalTemplate, setItemTableTemplate] = useState(null);
 
   useEffect(() => {
     const getItems = async () => await fetchData({
@@ -33,10 +29,24 @@ function CollectionPage() {
     });
 
     setError(null);
+    setItems(null);
+    setItemTableTemplate(null);
 
     if (userId && collectionId) {
       getItems()
-        .then(data => setItems(data))
+        .then(data => {
+            setItems(data.items);
+
+            const customFields = Object.entries(data.customFields).reduce((fields, [type, fieldNames]) =>
+              fields.concat(fieldNames.map(fieldName => new InputModel({
+                name: `${fieldName}(${type})`,
+                label: `${fieldName} (${type})`,
+                type
+              }))), []);
+
+            setItemTableTemplate(initialItemModalTemplate.concat(customFields));
+          }
+        )
         .catch(err => setError(err));
     }
   }, [userId, collectionId]);
@@ -50,12 +60,16 @@ function CollectionPage() {
   }
 
   if (!items) {
-    return <Box sx={{ p: { xs: 2, sm: 3 } }}>
-      <CircularProgress/>
-    </Box>;
+    return (
+      <Box sx={{ p: { xs: 2, sm: 3 } }}>
+        <CircularProgress/>
+      </Box>
+    );
   }
 
   const createItemHandler = async item => {
+    console.log(item);
+
     try {
       return await fetchData({
         url: '/api/collection/item/create',
@@ -94,7 +108,7 @@ function CollectionPage() {
   return <Table
     mode="item"
     url={userId + '/' + collectionId}
-    features={itemTableTemplate}
+    features={[new InputModel({ name: '_id', label: 'id', enableEditing: false }), ...itemModalTemplate]}
     modalFields={itemModalTemplate}
     data={items}
     hasChangeRight={session?.user.id === userId}

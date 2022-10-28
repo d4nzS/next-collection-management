@@ -13,20 +13,32 @@ async function getAllItemsHandler(req, res) {
     const userId = params[0];
     const collectionId = params[1];
 
-    console.log(userId, collectionId)
-
     if (!Types.ObjectId.isValid(userId)) {
       throw ApiError.NotFound("This profile doesn't exist");
     }
 
     const user = await UserModel.findById({ _id: userId });
+
+    if (!user) {
+      throw ApiError.NotFound("This profile doesn't exist");
+    }
+
     const collection = user.collections.find(collection => collection._id.toString() === collectionId);
 
     if (!collection) {
       throw ApiError.NotFound("This collection doesn't exist");
     }
 
-    res.status(201).json(collection.items);
+    res.status(201).json({
+      items: collection.items,
+      customFields: {
+        number: collection.number,
+        string: collection.string,
+        textarea: collection.textarea,
+        radio: collection.radio,
+        date: collection.date
+      }
+    });
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message });
   }

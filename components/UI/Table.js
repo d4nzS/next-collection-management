@@ -106,7 +106,10 @@ const Table = ({ mode, url, features, modalFields, data, hasChangeRight, onCreat
             </MenuItem>
           ))
         }
-        : ({ cell }) => ({ ...getCommonEditTextFieldProps(cell, feature.type) })
+        : ({ cell }) => ({
+          ...getCommonEditTextFieldProps(cell, feature.type),
+          type: feature.type
+        })
     })),
     [features, getCommonEditTextFieldProps]
   );
@@ -141,12 +144,13 @@ const Table = ({ mode, url, features, modalFields, data, hasChangeRight, onCreat
           ? <CreateButton mode={mode} onOpenModal={openModalHandler}/>
           : null}
       />
-      <CreateNewRowModal
+      {isModalOpen && <CreateNewRowModal
+        mode={mode}
         fields={modalFields}
         isOpen={isModalOpen}
         onClose={closeModalHandler}
         onSubmit={createNewRowHandler}
-      />
+      />}
     </Container>
   );
 };

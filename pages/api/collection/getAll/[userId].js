@@ -17,7 +17,18 @@ async function getAllCollectionsHandler(req, res) {
 
     const user = await UserModel.findById({ _id: userId });
 
-    res.status(201).json(user.collections);
+    if (!user) {
+      throw ApiError.NotFound("This profile doesn't exist");
+    }
+
+    const collections = user.collections.map(collection => ({
+      _id: collection._id,
+      name: collection.name,
+      topic: collection.topic,
+      description: collection.description
+    }));
+
+    res.status(201).json(collections);
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message });
   }

@@ -7,24 +7,23 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
+  FormLabel,
   InputLabel,
-  MenuItem,
+  MenuItem, Radio,
+  RadioGroup,
   Select,
   Stack,
   TextField
 } from '@mui/material';
 import CreatableSelect from 'react-select/creatable';
 
-const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
+const CreateNewRowModal = ({ mode, fields, isOpen, onClose, onSubmit }) => {
   const [values, setValues] = useState(fields.reduce((fieldsObj, field) => {
-    fieldsObj[field.name] = field.type === 'tags'
-      ? []
-      : '';
+    fieldsObj[field.name] = field.type === 'tags' ? [] : '';
 
     return fieldsObj;
   }, {}));
-
-  console.log(values);
 
   const changeHandler = event => {
     setValues(prevValues => ({
@@ -63,6 +62,22 @@ const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
           </FormControl>
         );
 
+      case 'radio':
+        return (
+          <FormControl key={field.name} variant="standard">
+            <FormLabel id={field.name}>{field.label}</FormLabel>
+            <RadioGroup
+              name={field.name}
+              value={values[field.name]}
+              onChange={changeHandler}
+              required={field.required}
+            >
+              <FormControlLabel value="Yes" control={<Radio/>} label="Yes"/>
+              <FormControlLabel value="No" control={<Radio/>} label="No"/>
+            </RadioGroup>
+          </FormControl>
+        );
+
       case 'tags':
         return <CreatableSelect
           key={field.name}
@@ -81,6 +96,7 @@ const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
           variant="standard"
           name={field.name}
           label={field.label}
+          type={field.type}
           value={values[field.name]}
           onChange={changeHandler}
           required={field.required}
@@ -91,7 +107,7 @@ const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
 
   return (
     <Dialog open={isOpen}>
-      <DialogTitle textAlign="center">Create Collection</DialogTitle>
+      <DialogTitle textAlign="center">Create {mode}</DialogTitle>
       <Box
         component="form"
         onSubmit={submitHandler}
@@ -114,7 +130,7 @@ const CreateNewRowModal = ({ isOpen, fields, onClose, onSubmit }) => {
             type="submit"
             color="secondary"
             variant="contained"
-          >Create Collection</Button>
+          >Create {mode}</Button>
         </DialogActions>
       </Box>
     </Dialog>

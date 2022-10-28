@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { Delete, Edit, Launch } from '@mui/icons-material';
-import Link from 'next/link';
 
 const TableActions = ({ link, hasChangeRight, onEditRow, onDeleteRow }) => {
   return (

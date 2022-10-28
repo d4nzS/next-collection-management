@@ -18,11 +18,11 @@ const collectionTableTemplate = [
 
 const collectionModalTemplate = [
   ...collectionTableTemplate,
-  new InputModel({ name: 'customNumberFields', label: 'Type number fields and press enter...', type: 'tags', required: false }),
-  new InputModel({ name: 'customStringFields', label: 'Type string fields and press enter...', type: 'tags', required: false }),
-  new InputModel({ name: 'customTextFields', label: 'Type text fields and press enter...', type: 'tags', required: false }),
-  new InputModel({ name: 'customCheckboxFields', label: 'Type yes/no fields and press enter...', type: 'tags', required: false }),
-  new InputModel({ name: 'customDateFields', label: 'Type text fields and press enter...', type: 'tags', required: false })
+  new InputModel({ name: 'number', label: 'Type number fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'string', label: 'Type string fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'textarea', label: 'Type text fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'radio', label: 'Type yes/no fields and press enter...', type: 'tags', required: false }),
+  new InputModel({ name: 'date', label: 'Type text fields and press enter...', type: 'tags', required: false })
 
 ];
 
@@ -38,6 +38,7 @@ function ProfilePage() {
     const getCollections = async () => await fetchData({ url: `/api/collection/getAll/${userId}` });
 
     setError(null);
+    setCollections(null);
 
     if (userId) {
       getCollections()
@@ -55,9 +56,11 @@ function ProfilePage() {
   }
 
   if (!collections) {
-    return <Box sx={{ p: { xs: 2, sm: 3 } }}>
-      <CircularProgress/>
-    </Box>;
+    return (
+      <Box sx={{ p: { xs: 2, sm: 3 } }}>
+        <CircularProgress/>
+      </Box>
+    );
   }
 
   const createCollectionHandler = async collection => {
