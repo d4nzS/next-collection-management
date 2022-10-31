@@ -10,7 +10,7 @@ function ItemPage() {
   return (
     <Container component="main" maxWidth="xl" sx={{ p: { xs: 2, sm: 3 } }}>
       <Typography component="h1" variant="h5" align="center" sx={{ textTransform: 'uppercase' }}>
-        Now this page isn't ready for production but it's being built
+        Now this page is not ready for production but it is being built
       </Typography>
     </Container>
   );
