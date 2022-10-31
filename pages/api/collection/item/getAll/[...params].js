@@ -31,6 +31,7 @@ async function getAllItemsHandler(req, res) {
 
     res.status(201).json({
       items: collection.items,
+      image: collection.image,
       customFields: {
         number: collection.number,
         string: collection.string,

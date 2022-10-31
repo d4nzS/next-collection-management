@@ -1,21 +1,24 @@
-import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import fetchData from '../utils/fetch-data';
+import Home from '../components/Home/Home';
+import LoadingSpinner from '../components/UI/LoadingSpinner';
 
 function HomePage() {
-  const { data: session } = useSession();
+  const [users, setUsers] = useState(null);
 
-  if (session === undefined) {
-    return;
+  useEffect(() => {
+    const getUsers = async () => await fetchData({ url: 'api/users' });
+
+    getUsers()
+      .then(data => setUsers(data))
+      .catch(console.log);
+  }, []);
+
+  if (!users) {
+    return <LoadingSpinner/>
   }
 
-  if (session) {
-    return (
-      <>
-        Signed in as {session.user.email}<br/>
-      </>
-    );
-  }
-
-  return <>Not signed in :(</>
+  return <Home users={users}/>;
 }
 
 export default HomePage;

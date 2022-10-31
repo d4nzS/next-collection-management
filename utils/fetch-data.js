@@ -1,8 +1,8 @@
-async function fetchData(requestConfig) {
+async function fetchData(requestConfig, hasFile = false) {
   const response = await fetch(requestConfig.url, {
     method: requestConfig.method || 'GET',
-    body: JSON.stringify(requestConfig.body) || null,
-    headers: { 'Content-Type': 'application/json' }
+    body: (hasFile ? requestConfig.body : JSON.stringify(requestConfig.body)) || null,
+    ...(!hasFile && { headers: { 'Content-Type': 'application/json' } }),
   });
 
   if (!response.ok) {

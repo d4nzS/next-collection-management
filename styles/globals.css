@@ -11,6 +11,10 @@ a {
   text-decoration: none;
 }
 
+.ag-cell a {
+  text-decoration: underline;
+}
+
 * {
   box-sizing: border-box;
 }

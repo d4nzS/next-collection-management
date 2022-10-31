@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Error from 'next/error';
 import { useSession } from 'next-auth/react';
-import { Box, CircularProgress } from '@mui/material';
 
 import InputModel from '../../../models/client/input-model';
 import fetchData from '../../../utils/fetch-data';
+import CollectionImage from '../../../components/Collection/CollectionImage';
 import Table from '../../../components/UI/Table';
+import LoadingSpinner from '../../../components/UI/LoadingSpinner';
 
 const initialItemModalTemplate = [
   new InputModel({ name: 'name', label: 'Name' }),
@@ -14,13 +15,16 @@ const initialItemModalTemplate = [
 ];
 
 function CollectionPage() {
-  const { data: session } = useSession();
   const router = useRouter();
   const userId = router.query.profileId;
   const collectionId = router.query.collectionId;
 
+  const { data: session } = useSession();
+  const hasChangeRight = session?.user.id === userId || session?.user.isAdmin;
+
   const [error, setError] = useState(null);
   const [items, setItems] = useState(null);
+  const [collectionImageSrc, setCollectionImageSrc] = useState(null);
   const [itemModalTemplate, setItemTableTemplate] = useState(null);
 
   useEffect(() => {
@@ -30,13 +34,12 @@ function CollectionPage() {
 
     setError(null);
     setItems(null);
+    setCollectionImageSrc(null);
     setItemTableTemplate(null);
 
     if (userId && collectionId) {
       getItems()
         .then(data => {
-            setItems(data.items);
-
             const customFields = Object.entries(data.customFields).reduce((fields, [type, fieldNames]) =>
               fields.concat(fieldNames.map(fieldName => new InputModel({
                 name: `${fieldName}(${type})`,
@@ -44,6 +47,8 @@ function CollectionPage() {
                 type
               }))), []);
 
+            setItems(data.items);
+            setCollectionImageSrc(data.image);
             setItemTableTemplate(initialItemModalTemplate.concat(customFields));
           }
         )
@@ -60,16 +65,10 @@ function CollectionPage() {
   }
 
   if (!items) {
-    return (
-      <Box sx={{ p: { xs: 2, sm: 3 } }}>
-        <CircularProgress/>
-      </Box>
-    );
+    return <LoadingSpinner/>;
   }
 
   const createItemHandler = async item => {
-    console.log(item);
-
     try {
       return await fetchData({
         url: '/api/collection/item/create',
@@ -105,17 +104,22 @@ function CollectionPage() {
     }
   };
 
-  return <Table
-    mode="item"
-    url={userId + '/' + collectionId}
-    features={[new InputModel({ name: '_id', label: 'id', enableEditing: false }), ...itemModalTemplate]}
-    modalFields={itemModalTemplate}
-    data={items}
-    hasChangeRight={session?.user.id === userId}
-    onCreateRow={createItemHandler}
-    onEditRow={updateItemHandler}
-    onDeleteRow={deleteItemCollectionHandler}
-  />
+  return (
+    <>
+      {collectionImageSrc && <CollectionImage src={collectionImageSrc}/>}
+      <Table
+        mode="item"
+        url={`${userId}/${collectionId}`}
+        features={[new InputModel({ name: '_id', label: 'id', enableEditing: false }), ...itemModalTemplate]}
+        modalFields={itemModalTemplate}
+        data={items}
+        hasChangeRight={hasChangeRight}
+        onCreateRow={createItemHandler}
+        onEditRow={updateItemHandler}
+        onDeleteRow={deleteItemCollectionHandler}
+      />
+    </>
+  );
 }
 
 export default CollectionPage;

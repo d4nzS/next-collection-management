@@ -9,13 +9,16 @@ const CollectionSchema = new Schema({
   textarea: [{ type: String, default: [] }],
   radio: [{ type: String, default: [] }],
   date: [{ type: String, default: [] }],
-  items: { type: Array, default: [] }
+  items: { type: Array, default: [] },
+  image: { type: String, required: true },
 });
 
 const UserSchema = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
-  collections: { type: [CollectionSchema], default: [] }
+  isBlocked: { type: Boolean, required: true },
+  isAdmin: { type: Boolean, required: true },
+  collections: { type: [CollectionSchema], default: [] },
 });
 
 const UserModel = models.User || model('User', UserSchema);

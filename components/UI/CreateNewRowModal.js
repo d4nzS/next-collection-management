@@ -10,7 +10,8 @@ import {
   FormControlLabel,
   FormLabel,
   InputLabel,
-  MenuItem, Radio,
+  MenuItem,
+  Radio,
   RadioGroup,
   Select,
   Stack,
@@ -18,7 +19,7 @@ import {
 } from '@mui/material';
 import CreatableSelect from 'react-select/creatable';
 
-const CreateNewRowModal = ({ mode, fields, isOpen, onClose, onSubmit }) => {
+const CreateNewRowModal = ({ mode, fields, onClose, onSubmit }) => {
   const [values, setValues] = useState(fields.reduce((fieldsObj, field) => {
     fieldsObj[field.name] = field.type === 'tags' ? [] : '';
 
@@ -28,7 +29,7 @@ const CreateNewRowModal = ({ mode, fields, isOpen, onClose, onSubmit }) => {
   const changeHandler = event => {
     setValues(prevValues => ({
       ...prevValues,
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.files?.[0] || event.target.value,
     }));
   };
 
@@ -83,6 +84,10 @@ const CreateNewRowModal = ({ mode, fields, isOpen, onClose, onSubmit }) => {
           key={field.name}
           isClearable
           isMulti
+          options={[{
+            value: field.name,
+            label: field.name
+          }]}
           onChange={newValue => setValues(prevValues => ({
             ...prevValues,
             [field.name]: newValue.map(val => val.value.trim())
@@ -91,22 +96,26 @@ const CreateNewRowModal = ({ mode, fields, isOpen, onClose, onSubmit }) => {
         />
 
       default:
+        const valueProp = {
+          ...(field.type !== 'file' && { value: values[field.name] })
+        };
+
         return <TextField
           key={field.name}
           variant="standard"
           name={field.name}
           label={field.label}
           type={field.type}
-          value={values[field.name]}
           onChange={changeHandler}
           required={field.required}
           multiline={field.type === 'textarea'}
+          {...valueProp}
         />;
     }
   });
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={true} onClose={onClose}>
       <DialogTitle textAlign="center">Create {mode}</DialogTitle>
       <Box
         component="form"

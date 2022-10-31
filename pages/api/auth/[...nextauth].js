@@ -4,6 +4,8 @@ import { compare, hash } from 'bcrypt';
 
 import connectMongo from '../../../utils/connectMongo';
 import UserModel from '../../../models/db/user-model';
+import ApiError from '../../../exceptions/api-error';
+import { signOut } from 'next-auth/react';
 
 connectMongo();
 
@@ -23,24 +25,28 @@ export const authOptions = {
         switch (mode) {
           case 'registration':
             if (user) {
-              throw new Error('This email is already in use!');
+              throw ApiError.Unauthorized('This email is already in use!');
             }
 
             const hashPassword = await hash(password, 3);
 
-            await UserModel.create({ email, password: hashPassword });
+            await UserModel.create({ email, password: hashPassword, isBlocked: false, isAdmin: false });
 
             break;
 
           case 'login':
             if (!user) {
-              throw new Error("This email doesn't exist!");
+              throw ApiError.Unauthorized("This email doesn't exist!");
             }
 
             const isPassEquals = await compare(password, user.password);
 
             if (!isPassEquals) {
-              throw new Error('Incorrect password!');
+              throw ApiError.Unauthorized('Incorrect password!');
+            }
+
+            if (user.isBlocked) {
+              throw ApiError.Forbidden();
             }
 
             break;
@@ -57,8 +63,10 @@ export const authOptions = {
       const user = await UserModel.findOne({ email: session.user.email });
 
       session.user.id = user._id;
+      session.user.isAdmin = user.isAdmin;
+      session.user.isBlocked = user.isBlocked;
 
-      return session; // need to fix but it works
+      return session;
     }
   }
 };

@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 import MaterialReactTable from 'material-react-table';
-import { Container, MenuItem } from '@mui/material';
+import { Box, Container, MenuItem } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 
 import classes from './Table.module.css';
 import CreateNewRowModal from './CreateNewRowModal';
-import CreateButton from './CreateButton';
+import CreateButton from './Buttons/CreateButton';
+import ExportCSVButton from './Buttons/ExportCSVButton';
 import TableActions from './TableActions';
 
 const Table = ({ mode, url, features, modalFields, data, hasChangeRight, onCreateRow, onEditRow, onDeleteRow }) => {
@@ -97,18 +98,19 @@ const Table = ({ mode, url, features, modalFields, data, hasChangeRight, onCreat
       Cell: ({ row }) => feature.isMarkdown
         ? <ReactMarkdown className={classes.markdown}>{row.original[feature.name]}</ReactMarkdown>
         : row.original[feature.name],
-      muiTableBodyCellEditTextFieldProps: feature.type === 'select'
+      muiTableBodyCellEditTextFieldProps: feature.type === 'select' || feature.type === 'radio'
         ? {
           select: true,
-          children: feature.options.map(option => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))
+          children: (feature.options || ['Yes', 'No']).map(option => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))
         }
         : ({ cell }) => ({
           ...getCommonEditTextFieldProps(cell, feature.type),
-          type: feature.type
+          type: feature.type === 'textarea' ? 'text' : feature.type,
+          multiline: feature.type === 'textarea',
         })
     })),
     [features, getCommonEditTextFieldProps]
@@ -140,9 +142,14 @@ const Table = ({ mode, url, features, modalFields, data, hasChangeRight, onCreat
             onDeleteRow={() => deleteRowHandler(row)}
           />
         )}
-        renderTopToolbarCustomActions={() => hasChangeRight
-          ? <CreateButton mode={mode} onOpenModal={openModalHandler}/>
-          : null}
+        renderTopToolbarCustomActions={() => (
+          <Box
+            sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}
+          >
+            {hasChangeRight && <CreateButton mode={mode} onOpenModal={openModalHandler}/>}
+            <ExportCSVButton columns={columns} data={tableData}/>
+          </Box>
+        )}
       />
       {isModalOpen && <CreateNewRowModal
         mode={mode}

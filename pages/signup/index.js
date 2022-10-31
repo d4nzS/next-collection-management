@@ -12,7 +12,7 @@ function SignUpPage() {
   const router = useRouter();
   const isAuthed = !!session;
 
-  useRedirect(isAuthed, router);
+  useRedirect(isAuthed);
 
   if (session === undefined || isAuthed) {
     return;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import { signOut, useSession } from 'next-auth/react';
 import {
@@ -13,52 +13,20 @@ import {
   MenuItem,
   Toolbar,
   Tooltip,
-  Typography
+  Typography,
+  useTheme
 } from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: 0,
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('xs')]: {
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 1),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(3)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
-    },
-  },
-}));
+import { ColorModeContext } from '../../store/ColorModeProvider';
 
 const NavBar = () => {
   const { data: session } = useSession();
   const router = useRouter();
+
+  const theme = useTheme();
+  const colorModeCtx = useContext(ColorModeContext);
 
   const [anchorElUser, setAnchorElUser] = useState(null);
 
@@ -127,24 +95,18 @@ const NavBar = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Container maxWidth="xl" sx={{pl: 0, pr: 0}}>
+        <Container maxWidth="xl" sx={{ pl: 0, pr: 0 }}>
           <Toolbar>
             <Typography
               variant="h6"
-              sx={{ mr: 2, cursor: 'pointer' }}
+              sx={{ mr: 1, cursor: 'pointer' }}
               onClick={() => linkHandler('/')}
             >
               CM
             </Typography>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon/>
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </Search>
+            <IconButton color="inherit" onClick={colorModeCtx.toggleColorMode}>
+              {theme.palette.mode === 'dark' ? <Brightness7Icon/> : <Brightness4Icon/>}
+            </IconButton>
             <Box sx={{ flexGrow: 1 }}/>
             {session ? userManagement : authButtons}
           </Toolbar>
